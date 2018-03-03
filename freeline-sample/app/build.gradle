@@ -1,0 +1,79 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.antfortune.freeline'
+
+freeline {
+    hack true
+    productFlavor "develop"
+    autoDependency false
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        applicationId "com.antfortune.freeline.sample"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        manifestPlaceholders = [
+                SUPPORT_RTL: false
+        ]
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".dev"
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "${variant.name}-${variant.versionName}.apk"
+                }
+            }
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        monkey {
+            matchingFallbacks = ['debug', 'release']
+        }
+    }
+
+    flavorDimensions "env"
+    productFlavors {
+        normal {
+        }
+
+        develop {
+        }
+    }
+
+    useLibrary 'org.apache.http.legacy'
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+
+dependencies {
+//    testCompile 'junit:junit:4.12'
+    implementation deps.appcompatV7
+
+    implementation project(":freeline-sample:common")
+    implementation project(":freeline-sample:PureJavaLib")
+    implementation project(":freeline-sample:ThirdParty:share")
+    implementation project(":freeline-sample:ThirdParty:payment")
+
+    releaseImplementation deps.freelineRuntimeNoOp
+    debugImplementation deps.freelineRuntime
+
+    implementation 'com.jakewharton:butterknife:8.4.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+
+    implementation "org.androidannotations:androidannotations-api:4.1.0"
+    annotationProcessor "org.androidannotations:androidannotations:4.1.0"
+}
